@@ -1,0 +1,607 @@
+<html>
+
+<head>
+<title>Base64 v2.10</title>
+
+<!--
+Todo:
+
+reverses function(stringfromcharccode)
+CharCodeAt (and reverse)
+decimal, hexa, binaire
+DecodeURI
+saltz :, change somes caracter 
+matrix reading
+first and end fix (for read only)
+Saltz 1 caracter
+
+TODO:Save as UTF8 ? ANSI ? to keep à carcters
+TODO: identifier les varaible selon la fonction ou appliquer let x="" pour limiter la valeur de la variable à la fonction
+ToDo: replace document.f1 par parentNode.
+
+TODO ::surrogate code
+https://medium.com/nerd-for-tech/basics-of-javascript-string-fromcharcode-method-a35dd47124a0
+https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/encodeURI
+https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode
+
+http://www.liangshunet.com/en/202005/332182170.htm
+https://jsfiddle.net/vir2alexport/7qa8jsou/
+https://www.codegrepper.com/code-examples/javascript/javascript+hex+to+ascii
+TODO ::Text/Binaire/Hex/UTF8/UTF16/Decimal
+"\uD834\uDF06a\uD834\uDF07"
+U+1F303 
+0x1F303
+55356, 57091
+0xD83C, 0xDF03
+-->
+
+<script>
+
+
+
+function showhide(lelement)
+	{
+	//To Hide or Show DIV 'lelement'
+	var x = document.getElementById(lelement);
+	if (x.style.display === "none") {
+    	x.style.display = "block";
+  		} else {
+    	x.style.display = "none";
+  		}
+	}
+
+function exchange()
+	{
+	//Available
+	temp1 = document.f1.t1.value;
+	temp2 = document.f1.t2.value
+	document.f1.t1.value = temp2;
+	document.f1.t2.value = temp1;
+	}
+
+function ROTSIZE(entreerotsize,clefrotsize)
+	{
+	//Available
+	taillerotsize=clefrotsize.length
+	sortierotsize=ROTX(entreerotsize,taillerotsize)
+	return sortierotsize 
+	}	
+
+function ROTX(entreerotx,clefrotx)
+	{
+	//available
+	entree=caracspe(entreerotx);
+	var s1rotx = "abcdefghijklmnopqrstuvwxyz";
+
+	//mise en minuscule
+	entreerotx=entreerotx.toLowerCase();
+
+	//longueur de machaine
+	longentreerotx=(entreerotx.length);
+	
+	sortierotx=""
+	for(irotx=0 ; irotx < longentreerotx ; irotx++) 
+		{
+		//prendre le caractère en question
+		moncaracrotx=entreerotx.charAt(irotx);
+		//trouver la position du caractère
+		positionrotx=s1rotx.indexOf(moncaracrotx);
+	
+		//décaler en rotX
+		if (positionrotx>"-1")
+			{
+			positionrotx=positionrotx+(clefrotx*1);
+			if (positionrotx>25)
+				{positionrotx=positionrotx-26;}
+			moncaracrotx=s1rotx.charAt(positionrotx);
+			}
+		sortierotx+=moncaracrotx;
+		}
+	return sortierotx
+	}
+
+function ROTall(entree2)
+	{
+	//available
+	sortie2=""
+	for (i2=1; i2 < 26; i2++) 
+		{
+		sortie2+="ROT"+i2 + " (UnROT"+(26-i2)+"): "
+		sortie2+=ROTX(entree2,i2)
+		sortie2+="\n"
+		}
+	return sortie2
+	}	
+function txt2bin(entree)
+	{
+	//Available
+  	sortie=""
+  	for (i=0; i < entree.length; i++) {
+		sortie+=entree[i].charCodeAt(0).toString(2) + " ";
+  	}
+  	sortie=sortie.trim() //remove space at the start and beginning of string
+  	return (sortie)
+	}
+
+function bin2txt(entree)
+	{
+	//available
+	return entree.split(' ').map(letter=>String.fromCharCode(parseInt(letter, 2))).join('');
+	}
+
+function xdecimal()
+	{
+	//To Adapt
+    decimal = document.getElementById("decimal");
+    hexadecimal = document.getElementById("hexadecimal");
+    binaire = document.getElementById("binaire");
+ 
+    hexadecimal.value = (decimal.value-0).toString(16);
+    binaire.value = (decimal.value-0).toString(2);
+	}
+ 
+function xhexadecimal()
+	{
+	//To Adapt
+    decimal = document.getElementById("decimal");
+    hexadecimal = document.getElementById("hexadecimal");
+    binaire = document.getElementById("binaire");
+ 
+    decimal.value = parseInt(hexadecimal.value,16);
+    binaire.value = (parseInt(hexadecimal.value,16)).toString(2);
+	}
+ 
+function xbinaire()
+	{
+	//To Adapt
+    decimal = document.getElementById("decimal");
+    hexadecimal = document.getElementById("hexadecimal");
+    binaire = document.getElementById("binaire");
+ 
+    decimal.value = parseInt(binaire.value,2);
+    hexadecimal.value = (parseInt(binaire.value,2)).toString(16);
+	}
+
+function caracspe(tosimple)
+	{
+	//To include into other function
+	//Remove special signs
+	
+	tosimple = tosimple.replace("é", "e");
+	tosimple = tosimple.replace("ë", "e");
+	tosimple = tosimple.replace("è", "e");
+	tosimple = tosimple.replace("ê", "e");
+	tosimple = tosimple.replace("à", "a");
+	tosimple = tosimple.replace("â", "a");
+	tosimple = tosimple.replace("û", "u");
+	tosimple = tosimple.replace("ù", "u");
+	tosimple = tosimple.replace("ô", "o");
+	tosimple = tosimple.replace("î", "i");
+	tosimple = tosimple.replace("ï", "i");
+	tosimple = tosimple.replace("œ", "oe");
+	return tosimple
+	}
+
+
+function SFCC(entree)
+	{
+	//OK but need reverse and explaination
+  	entree=entree.trim() //remove space at the start and beginning of string
+	
+	if (entree.slice(-1) == "," ) //remove comma at the end of string
+		{entree = entree.slice(0, -1)}
+
+	entree=entree.replace('  ',' ') //replace doublespace by space
+	entree=entree.replace(' ',',') //replace space by comma
+	entree=entree.replace(',,',',') //replace doublespace by space
+	result_epluche=""
+	
+	var epluche1=entree.split(",") //split with comma
+	for(var i=0;i<epluche1.length;i++){
+		result_epluche+=String.fromCharCode(epluche1[i])
+		}
+	return result_epluche
+	}
+
+function SFCP(entree)
+	{
+	//OK but need reverse and explaination
+	entree=entree.trim() //remove space at the start and beginning of string
+	
+	if (entree.slice(-1) == "," ) //remove comma at the end of string
+		{entree = entree.slice(0, -1)}
+
+	entree=entree.replace('  ',' ') //replace doublespace by space
+	entree=entree.replace(' ',',') //replace space by comma
+	entree=entree.replace(',,',',') //replace doublespace by space
+	result_epluche=""
+	
+	var epluche1=entree.split(",") //split with comma
+	for(var i=0;i<epluche1.length;i++){
+		result_epluche+=String.fromCodePoint(epluche1[i]);
+		}
+	return result_epluche
+	}
+
+function CCA(entree)
+	{
+	//available
+	sortie=""
+	for(var i=0;i<entree.length;i++){
+		sortie+=entree.charCodeAt(i)
+		sortie+=","
+		}
+		sortie=removelastcaracterif(sortie,",")
+		return sortie
+	}	
+
+
+function CPA(entree)
+	{
+	//available 
+	// to complete this URL below
+	//https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/String/codePointAt
+	sortie=""
+	for(var i=0;i<entree.length;i++)
+		{
+		sortie+=entree.codePointAt(i)
+		sortie+=","
+		}
+		sortie=removelastcaracterif(sortie,",")
+		return sortie
+	}
+
+function removelastcaracterif(entree,carac)
+	{
+		//available
+		//this function remove the caracter 'carac' if it is ending the string 'entree'
+		lastcarac=entree.charAt(entree.length-1)
+		if (carac==lastcarac)
+			{
+			sortie=entree.slice(0,-1)
+			return sortie
+			}
+		else 
+			{return entree}
+	}
+
+function ROT13(entreerot13)
+	{
+		//available
+		sortierot13=ROTX(entreerot13,13)
+		return sortierot13
+	}
+
+function ROT20(entree)
+	{
+	//available
+	entree=caracspe(entree);
+
+	var s1 = "abcdefghijklmnopqrstuvwxyz0123456789.,!?";
+
+	//mise en minuscule
+	entree=entree.toLowerCase();
+
+	//longueur de machaine
+	longentree=(entree.length);
+
+	sortie=""
+	//Pour chaque caractère de machaine
+	for(i=0 ; i < longentree ; i++) 
+		{
+		//prendre le caractére en question
+		moncarac=entree.charAt(i);
+
+		//trouver la position du caractére
+		positionrot20=s1.indexOf(moncarac);
+
+		//décaler en rot20
+		if (positionrot20>"-1")
+			{
+			positionrot20=positionrot20+20;
+			if (positionrot20>39)
+				{positionrot20=positionrot20-40;}
+			moncarac=s1.charAt(positionrot20);		
+			}
+		sortie+=moncarac;
+		}
+	return sortie
+	}
+	
+function ROTKEY(entreerotkey,clefrotkey,saltzrotkey)
+	{
+		entreerotkey=entreerotkey.toLowerCase();
+		entreerotkey=caracspe(entreerotkey)
+		sortierotkey=""
+		longmaclefrotkey=(clefrotkey.length);
+		longmaentreerotkey=(entreerotkey.length);
+		var s1rotkey = "abcdefghijklmnopqrstuvwxyz";
+		var jrotkey=0;
+
+		//ForEach caracter
+		for(irotkey=0 ; irotkey < longmaentreerotkey ; irotkey++) 
+			{
+			if (jrotkey>=longmaclefrotkey)
+				{
+				//Reuse key if smaller than text to ROT
+				if (saltzrotkey==true)
+					{
+					saltz=SaltZ()	
+					sortierotkey+=saltz	
+					}
+				jrotkey=0;
+
+				}
+
+				//get caracter of the key
+				caracclefrotkey=clefrotkey.charAt(jrotkey);
+				//get position of the caracter
+				poscaracclefrotkey=s1rotkey.indexOf(caracclefrotkey);
+							
+				//apply variance to the chain by position of character
+				new_pos_entree_rotkey=ROTX(entreerotkey.charAt(irotkey),poscaracclefrotkey)
+				sortierotkey+=new_pos_entree_rotkey;
+				jrotkey++;
+				}
+			return sortierotkey;
+		}
+
+function SaltZ()
+{
+var s1 = "abcdefghijklmnopqrstuvwxyz";
+var nbaleatoire=Math.floor(Math.random()*25)
+lettrealeatoire=s1.charAt(nbaleatoire);
+return lettrealeatoire;
+}
+		//To Add : SALTZ
+
+function inverserTexte()
+{
+// Remplit le t2 avec le texte inversé de t1	
+	document.f1.t2.value = document.f1.t1.value.split('').reverse().join('');
+}
+
+function URL2DL()
+{
+var adres = window.prompt('@','');
+document.getElementById("outputDiv").innerHTML = "<center><a href="+adres+">CHOPER</a></center>";
+}
+
+function UnEpoch()
+{
+    var txt = document.f1.t1.value;
+    // Regex : capture les timestamps 10 ou 13 digits
+    var regex = /\b\d{10}\b|\b\d{13}\b/g;
+    var converted = txt.replace(regex, function(match) {
+			var ts = Number(match);
+			// Si 10 digits → secondes → convertir en ms
+			if (match.length === 10) {ts *= 1000;}
+			var date = new Date(ts);
+			if (isNaN(date.getTime())) {return match; // ne remplace pas si invalide
+			}
+				// Format ISO
+				return date.toISOString();
+				});
+			document.f1.t2.value = converted;
+}
+
+function DefangIP(txt) {
+    // remplace chaque point par [.]
+    return txt.replace(/\b(\d{1,3}\.){3}\d{1,3}\b/g, function(ip) {
+        return ip.replace(/\./g, "[.]");
+    });
+}
+
+function DefangURL(txt) {
+    return txt.replace(/https?:\/\/[^\s]+/gi, function(url) {
+
+        // defang protocole
+        var u = url.replace(/^http/i, "hxxp");
+
+        // defang les points
+        u = u.replace(/\./g, "[.]");
+
+        return u;
+    });
+}
+
+function RefangIP(txt) {
+	return txt.replace(/\[\.\]/g, ".");
+}
+
+function RefangURL(txt) {
+	var out = txt;
+	out = out.replace(/hxxps?/gi, "http");
+	out = out.replace(/\[\.\]/g, ".");
+	return out;
+	}
+
+function RefangEmail(txt) {
+    return txt
+        .replace(/\[@\]/g, "@")
+        .replace(/\[\.\]/g, ".");
+}
+
+function DefangEmail(text) {
+    return text
+        .replace(/@/g, "[@]")
+        .replace(/\./g, "[.]");
+}
+
+
+
+function DefangAll() {
+    var txt = document.f1.t1.value;
+
+    txt = DefangIP(txt);
+    txt = DefangURL(txt);
+	txt = DefangEmail(txt);
+	txt = DefangIPV6(txt);
+    document.f1.t2.value = txt;
+}
+
+function RefangAll() {
+    var txt = document.f1.t1.value;
+
+    txt = RefangIP(txt);
+    txt = RefangURL(txt);
+	txt = RefangEmail(txt);
+	txt = RefangIPV6(txt);
+    document.f1.t2.value = txt;
+	
+}
+
+function DefangIPV6(text) {
+    return text.replace(/:/g, "[:]");
+}
+
+function RefangIPV6(text) {
+    return text.replace(/\[:\]/g, ":");
+}
+
+function img2b64() {
+    var f = document.getElementById('fileIn').files[0];
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function(e) {
+        document.f1.t4.value = e.target.result;
+        document.getElementById('img1').src = e.target.result;
+    };
+    r.readAsDataURL(f);
+}
+
+function b642img() {
+    var str = document.f1.t5.value.trim();
+    if (!str) return;
+    // Ajoute le préfixe data URL standard si omis
+    if (!str.startsWith('data:image/')) {
+        str = 'data:image/png;base64,' + str;
+    }
+    document.getElementById('img2').src = str;
+}
+
+</script>
+
+</head>
+
+<body bgcolor=black text=white>
+Read Todo Comment into Source
+
+<form name=f1>
+<textarea name=t1 rows=6 cols=50 >aaaaaa</textarea>
+	<input name=cpt1 type="text" size="5" value="count" onclick="this.value=document.f1.t1.value.length;" >
+<textarea name=t2 rows=6 cols=50></textarea>
+	<input name="cpt2"type="text" size="5"  value="count"  onclick="this.value=document.f1.t2.value.length;" >
+
+
+  <div id=outputDiv style="width: 200px; height: 50px; border: 1px solid #ccc; padding: 10px;"></div>
+<hr> 
+
+<input type=button value=ClearAll onclick="document.f1.t1.value='';document.f1.t2.value=''">
+<input type="button" value="-> <-" onclick="exchange()">
+<input type=button value=ClearRight onclick="document.f1.t2.value=''";>
+<input type=button value=ClearLeft onclick="document.f1.t1.value='';">
+<hr>
+<input type=button value=EncodeBase64 onclick="document.f1.t2.value=btoa(document.f1.t1.value)";>
+<input type=button value=DecodeBase64 onclick="document.f1.t2.value=atob(document.f1.t1.value)";>
+<span onclick="document.f1.t1.value=this.innerText;">dGVzdA==</span> => test
+<hr>
+<input type=button value=Escape onclick="document.f1.t2.value=escape(document.f1.t1.value)";>
+<input type=button value=UnEscape onclick="document.f1.t2.value=unescape(document.f1.t1.value)";>
+<span onclick="document.f1.t1.value=this.innerText;">%201+1%3D2==</span> => " 1+1=2"
+
+<hr>
+<input type="button" value="abc...cba" onclick="inverserTexte()";>
+<hr>
+<input type="button" value="CodePointAt" Onclick="document.f1.t2.value=CCA(document.f1.t1.value);">
+<input type="button" value="CodePointAt" Onclick="document.f1.t2.value=CPA(document.f1.t1.value);">
+<hr>
+<input type="button" value="Txt2Bin"  Onclick="document.f1.t2.value=txt2bin(document.f1.t1.value);" >
+<input type="button" value="Bin2Txt" Onclick="document.f1.t2.value=bin2txt(document.f1.t1.value);">
+<hr>
+
+<span onclick="showhide('fromcharcode');">Show example</span>
+<input type="button" value="FromCharCode" Onclick="document.f1.t2.value=SFCC(document.f1.t1.value);">
+<input type="button" value="FromCodePoint" Onclick="document.f1.t2.value=SFCP(document.f1.t1.value);">
+
+<div id="fromcharcode" hidden>
+<span onclick="document.f1.t1.value=this.innerText;">65,66,67,600</span> = ABCɘ = DECIMAL 2 TEXT;<br>
+(<span onclick="document.f1.t1.value=this.innerText;">0x2014</span>)=—<br>
+(<span onclick="document.f1.t1.value=this.innerText;">0x12014</span>)=—<br> 
+(<span onclick="document.f1.t1.value=this.innerText;">8212</span>)= —<br>
+(<span onclick="document.f1.t1.value=this.innerText;">0b01001010</span>)=J BINARY 2 TEXT;<br> 
+(<span onclick="document.f1.t1.value=this.innerText;">0xD83C, 0xDF03</span>)=emoji;<br>
+(<span onclick="document.f1.t1.value=this.innerText;">129318</span>)=emoji;<br>
+(<span onclick="document.f1.t1.value=this.innerText;">0x21</span>)=HEX 2 TEXT;<br>
+</div>
+<hr>
+<input type="button" value="ROT13"  Onclick="document.f1.t2.value=ROT13(document.f1.t1.value);" >
+<SELECT name="cesar">
+	<OPTION VALUE="1">01</OPTION>
+	<OPTION VALUE="2">02</OPTION>
+	<OPTION VALUE="3">03</OPTION>
+	<OPTION VALUE="4">04</OPTION>
+	<OPTION VALUE="5">05</OPTION>
+	<OPTION VALUE="6">06</OPTION>
+	<OPTION VALUE="7">07</OPTION>
+	<OPTION VALUE="8">08</OPTION>
+	<OPTION VALUE="9">09</OPTION>
+	<OPTION VALUE="10">10</OPTION>
+	<OPTION VALUE="11">11</OPTION>
+	<OPTION VALUE="12">12</OPTION>
+	<OPTION VALUE="13" selected >13 Cesar</OPTION>
+	<OPTION VALUE="14">14</OPTION>
+	<OPTION VALUE="15">15</OPTION>
+	<OPTION VALUE="16">16</OPTION>
+	<OPTION VALUE="17">17</OPTION>
+	<OPTION VALUE="18">18</OPTION>
+	<OPTION VALUE="19">19</OPTION>
+	<OPTION VALUE="20">20</OPTION>
+	<OPTION VALUE="21">21</OPTION>
+	<OPTION VALUE="22">22</OPTION>
+	<OPTION VALUE="23">23</OPTION>
+	<OPTION VALUE="24">24</OPTION>
+	<OPTION VALUE="25">25</OPTION>
+	<OPTION VALUE="26">26</OPTION>
+</SELECT>
+<input type="button" value="ROTX"  Onclick="document.f1.t2.value=ROTX(document.f1.t1.value,document.f1.cesar.value);">
+<input type="button" value="ROTall" Onclick="document.f1.t2.value=ROTall(document.f1.t1.value);">
+
+<br>
+<input type="text"  value="" name="ROTKEYF" onchange="document.f1.t2.value=ROTKEY(document.f1.t1.value,document.f1.ROTKEYF.value,document.f1.Saltz.checked)">
+ 
+<input type="button" value="ROTKEY" onclick="document.f1.t2.value=ROTKEY(document.f1.t1.value,document.f1.ROTKEYF.value,document.f1.Saltz.checked)">
+<input type="button" value="ROTSIZE" onclick="document.f1.t2.value=ROTSIZE(document.f1.t1.value,document.f1.ROTKEYF.value)"><br>
+
+<input type="button" value="ROT20"  Onclick="document.f1.t2.value=ROT20(document.f1.t1.value);">
+<input type="checkbox" name="Saltz" checked>SaltZ
+<hr>
+<input type="button" value="URL 2 DL" onclick="URL2DL()";>
+<hr>
+<input type="button" value="UnEpoch" onclick="UnEpoch()";> 
+<span onclick="document.f1.t1.value=this.innerText;">1785351624 > 2026-07-29T19:00:24.000Z</span>
+<hr>
+<input type="button" value="DefangALL" onclick="DefangAll()";> 
+<input type="button" value="RefangALL" onclick="RefangAll()";> 
+<span onclick="document.f1.t1.value=this.innerText;">http://malicious.com/path 192.168.1.10 contacted 8.8.8.8 bernard@evil.com 2001:0db8:85a3:0000:0000:8a2e:0370:7334</span>
+<hr>
+<div onclick="var s = document.getElementById('img64').style; s.display = (s.display == 'none') ? 'block' : 'none';" style="cursor: pointer;">
+Image ➔ Base64</div><br>
+<div id=img64 style="display:none">
+<input type="file" id="fileIn" onchange="img2b64()"><br><br>
+    <textarea name="t4" id="t4" rows="6" cols="60" placeholder="Base64 généré ici..."></textarea><br>
+    <input type="button" value="Afficher l'image 1" onclick="document.getElementById('img1').src=document.f1.t4.value;"><br>
+   <img id="img1" style="max-width:300px; max-height:200px; display:block; margin:5px 0; border:1px solid #555;"><br>
+<hr>
+Base64 ➔ Image :<br>
+ <textarea name="t5" id="t5" rows="6" cols="60" placeholder="Coller le Base64 ici..."></textarea><br>
+    <input type="button" value="Convertir en Image" onclick="b642img()"><br>
+    <div id="outputDiv" style="margin-top:5px;"><br>
+        <img id="img2" style="max-width:300px; max-height:200px; border:1px solid #555;"><br>
+    </div>
+</div>
+</form>
+
+</body>
+
+</html>
