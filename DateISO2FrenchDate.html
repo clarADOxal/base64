@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertisseur de Dates ISO vers FR</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 { margin-top: 0; font-size: 1.5rem; }
+
+        .help-box {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+            color: #1e40af;
+        }
+
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 16px;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover { background-color: var(--primary-hover); }
+
+        .output-section { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+
+        .result-area {
+            background-color: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📅 Convertisseur de Dates</h1>
+    
+    <div class="help-box">
+        Collez vos dates ISO (une par ligne). Elles seront converties au format <strong>JJ/MM/AAAA HH:mm:ss</strong>.
+    </div>
+
+    <label for="inputDates">Dates d'entrée</label>
+    <textarea id="inputDates" placeholder="2025-12-12T23:57:40.917Z">2025-12-12T23:57:40.917Z
+2026-05-20T14:10:05.123Z</textarea>
+
+    <button onclick="updateDates()">Mettre à jour</button>
+
+    <div id="resultContainer" class="output-section" style="display:none;">
+        <label>Dates formatées :</label>
+        <div id="outputDate" class="result-area"></div>
+    </div>
+</div>
+
+<script>
+function formatDate(str) {
+    const cleanStr = str.trim();
+    if (!cleanStr) return null;
+
+    const regex = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2}:\d{2})\.\d+Z$/;
+    const match = cleanStr.match(regex);
+    
+    if (!match) return `Format invalide : ${cleanStr}`;
+
+    const [ , year, month, day, time] = match;
+    // Retour au format strict demandé : Jour/Mois/Année Heure
+    return `${day}/${month}/${year} ${time}`;
+}
+
+function updateDates() {
+    const input = document.getElementById("inputDates").value;
+    const outputDiv = document.getElementById("outputDate");
+    const container = document.getElementById("resultContainer");
+
+    const lines = input.split('\n');
+    const results = lines.map(line => formatDate(line)).filter(res => res !== null);
+
+    if (results.length > 0) {
+        outputDiv.textContent = results.join('\n');
+        container.style.display = "block";
+    } else {
+        container.style.display = "none";
+    }
+}
+
+window.onload = updateDates;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Dates</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --primary-hover: #357abd;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #e1e4e8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 550px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: #555;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 5px;
+            margin-top: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="date"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        input[type="date"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .flex-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .flex-group .form-group {
+            flex: 1;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #eef5fc;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 4px;
+            font-weight: 600;
+            min-height: 24px;
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calculateur de Dates</h1>
+
+    <div class="form-group">
+        <label for="dateInitiale">Date initiale :</label>
+        <input type="date" id="dateInitiale">
+        <div class="hint">Saisie via le calendrier ou au clavier (JJ/MM/AAAA)</div>
+    </div>
+
+    <hr style="border: 0; height: 1px; background: var(--border-color); margin: 25px 0;">
+
+    <h2>1. Calculer l'écart entre deux dates</h2>
+    <div class="form-group">
+        <label for="dateDeuxieme">Deuxième date :</label>
+        <input type="date" id="dateDeuxieme">
+    </div>
+    <button onclick="calculerEcart()">Calculer l'écart</button>
+    <div class="result" id="resultatEcart">Choisissez une deuxième date pour voir le résultat.</div>
+
+    <h2>2. Ajouter ou soustraire des jours</h2>
+    <div class="flex-group">
+        <div class="form-group">
+            <label for="joursAction">Action :</label>
+            <select id="joursAction" style="width:100%; padding:10px; border-radius:6px; border:1px solid var(--border-color); font-size:1rem;">
+                <option value="ajouter">Ajouter (+)</option>
+                <option value="soustraire">Soustraire (-)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="nombreJours">Nombre de jours :</label>
+            <input type="number" id="nombreJours" min="0" value="0">
+        </div>
+    </div>
+    <button onclick="calculerNouvelleDate()">Calculer la nouvelle date</button>
+    <div class="result" id="resultatNouvelleDate">Entrez un nombre de jours pour voir le résultat.</div>
+</div>
+
+<script>
+    // Formatage des dates en français pour l'affichage textuel des résultats
+    const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+    // Au chargement de la page, on initialise la date initiale avec la date du jour
+    window.onload = function() {
+        const aujourdHui = new Date().toISOString().split('T')[0];
+        document.getElementById('dateInitiale').value = aujourdHui;
+        document.getElementById('dateDeuxieme').value = aujourdHui;
+    };
+
+    // Fonction pour calculer l'écart entre la date initiale et la deuxième date
+    function calculerEcart() {
+        const d1 = new Date(document.getElementById('dateInitiale').value);
+        const d2 = new Date(document.getElementById('dateDeuxieme').value);
+
+        if (isNaN(d1) || !document.getElementById('dateInitiale').value) {
+            alert("Veuillez saisir une date initiale valide.");
+            return;
+        }
+        if (isNaN(d2) || !document.getElementById('dateDeuxieme').value) {
+            alert("Veuillez saisir une deuxième date valide.");
+            return;
+        }
+
+        // Calcul de la différence en millisecondes puis conversion en jours
+        const differenceMs = d2 - d1;
+        const differenceJours = Math.round(differenceMs / (1000 * 60 * 60 * 24));
+        const differenceAbsolue = Math.abs(differenceJours);
+
+        let texteResultat = "";
+        if (differenceJours === 0) {
+            texteResultat = "Les deux dates sont identiques (0 jour d'écart).";
+        } else {
+            texteResultat = `Il y a ${differenceAbsolue} jour${differenceAbsolue > 1 ? 's' : ''} d'écart `;
+            texteResultat += differenceJours > 0 ? "en plus." : "en moins.";
+        }
+
+        document.getElementById('resultatEcart').innerText = texteResultat;
+    }
+
+    // Fonction pour ajouter ou soustraire des jours à la date initiale
+    function calculerNouvelleDate() {
+        const dateSource = new Date(document.getElementById('dateInitiale').value);
+        const nbJours = parseInt(document.getElementById('nombreJours').value, 10);
+        const action = document.getElementById('joursAction').value;
+
+        if (isNaN(dateSource) || !document.getElementById('dateInitiale').value) {
+            alert("Veuillez saisir une date initiale valide.");
+            return;
+        }
+        if (isNaN(nbJours)) {
+            alert("Veuillez saisir un nombre de jours valide.");
+            return;
+        }
+
+        // On applique l'opération
+        if (action === "ajouter") {
+            dateSource.setDate(dateSource.getDate() + nbJours);
+        } else {
+            dateSource.setDate(dateSource.getDate() - nbJours);
+        }
+
+        // Formatage du résultat final en français
+        const dateFormatee = dateSource.toLocaleDateString('fr-FR', optionsDate);
+        // Format court pour rappel (JJ/MM/AAAA)
+        const dateCourte = dateSource.toLocaleDateString('fr-FR');
+
+        document.getElementById('resultatNouvelleDate').innerText = `${dateFormatee} (${dateCourte})`;
+    }
+</script>
+
+</body>
+</html>
